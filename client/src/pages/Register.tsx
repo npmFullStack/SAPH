@@ -100,7 +100,7 @@ const Register = () => {
                 // Redirect based on role
                 const role = response.data.data.user.role;
                 if (role === "admin" || role === "superadmin") {
-                    navigate("/dashboard");
+                    navigate("/home");
                 } else {
                     navigate("/profile");
                 }
@@ -127,7 +127,7 @@ const Register = () => {
         >
             <Header />
 
-            <main className="flex-1 py-12 px-4">
+            <main className="flex-1 py-12 min-h-screen px-4">
                 <div className="container mx-auto max-w-6xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Left Column - Welcome Message with Background Image */}
@@ -398,7 +398,6 @@ const Register = () => {
                                     icon={UserPlus}
                                     iconPosition="left"
                                     loading={loading}
-                                    
                                 >
                                     {loading
                                         ? "Creating Account..."

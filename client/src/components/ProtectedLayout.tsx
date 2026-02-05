@@ -24,7 +24,13 @@ const ProtectedLayout = () => {
 
         // Check screen size
         const checkScreenSize = () => {
-            setIsMobile(window.innerWidth < 1024); // lg breakpoint
+            const mobile = window.innerWidth < 1024; // lg breakpoint
+            setIsMobile(mobile);
+            
+            // Auto-collapse sidebar on mobile
+            if (mobile) {
+                setSidebarCollapsed(false);
+            }
         };
 
         checkScreenSize();

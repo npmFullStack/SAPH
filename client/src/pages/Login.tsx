@@ -4,7 +4,15 @@ import api from "@/services/api";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { LogIn, Mail, Lock, AlertCircle, Sparkles, Eye, EyeOff } from "lucide-react";
+import {
+    LogIn,
+    Mail,
+    Lock,
+    AlertCircle,
+    Sparkles,
+    Eye,
+    EyeOff
+} from "lucide-react";
 import authBg from "@/assets/images/authImage.png";
 import heroBg from "@/assets/images/heroBg.png";
 
@@ -66,7 +74,7 @@ const Login = () => {
                 // Redirect based on role
                 const role = response.data.data.user.role;
                 if (role === "admin" || role === "superadmin") {
-                    navigate("/dashboard");
+                    navigate("/home");
                 } else {
                     navigate("/profile");
                 }
@@ -93,7 +101,10 @@ const Login = () => {
         >
             <Header />
 
-            <main className="flex-1 py-12 px-4">
+            <main
+                className="flex-1 min-h-screen 
+py-12 px-4"
+            >
                 <div className="container mx-auto max-w-6xl">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Left Column - Welcome Message with Background Image - UPDATED */}
@@ -201,7 +212,11 @@ const Login = () => {
                                             <input
                                                 id="password"
                                                 name="password"
-                                                type={showPassword ? "text" : "password"}
+                                                type={
+                                                    showPassword
+                                                        ? "text"
+                                                        : "password"
+                                                }
                                                 autoComplete="current-password"
                                                 required
                                                 value={formData.password}
@@ -213,14 +228,24 @@ const Login = () => {
                                             {/* Eye Icon Button */}
                                             <button
                                                 type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={() =>
+                                                    setShowPassword(
+                                                        !showPassword
+                                                    )
+                                                }
                                                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
                                                 tabIndex={-1}
                                             >
                                                 {showPassword ? (
-                                                    <EyeOff className="text-gray-400 hover:text-gray-600" size={20} />
+                                                    <EyeOff
+                                                        className="text-gray-400 hover:text-gray-600"
+                                                        size={20}
+                                                    />
                                                 ) : (
-                                                    <Eye className="text-gray-400 hover:text-gray-600" size={20} />
+                                                    <Eye
+                                                        className="text-gray-400 hover:text-gray-600"
+                                                        size={20}
+                                                    />
                                                 )}
                                             </button>
                                         </div>
@@ -260,7 +285,6 @@ const Login = () => {
                                     icon={LogIn}
                                     iconPosition="left"
                                     loading={loading}
-                                    
                                 >
                                     {loading ? "Signing in..." : "Sign In"}
                                 </Button>

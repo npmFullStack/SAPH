@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "@/services/api"; // Import your api instance
+import api from "@/services/api";
 import PageLayout from "@/components/PageLayout";
 import Button from "@/components/Button";
 import {

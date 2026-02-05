@@ -8,7 +8,8 @@ import {
     BookCheck,
     Calendar,
     SidebarOpen,
-    SidebarClose
+    SidebarClose,
+    Menu
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +47,7 @@ const ProHeader = ({
 
         // Check if mobile on mount and on resize
         const checkIfMobile = () => {
-            setIsMobile(window.innerWidth < 768); // md breakpoint
+            setIsMobile(window.innerWidth < 1024); // lg breakpoint to match sidebar
         };
 
         checkIfMobile();
@@ -114,22 +115,35 @@ const ProHeader = ({
             <div className="flex items-center justify-between px-4 md:px-6 py-4">
                 {/* Left: Sidebar Toggle and Logo */}
                 <div className="flex items-center gap-2">
-                    {/* Sidebar Toggle Button */}
-                    <button
-                        onClick={onToggleSidebar}
-                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                        aria-label={
-                            sidebarCollapsed
-                                ? "Expand sidebar"
-                                : "Collapse sidebar"
-                        }
-                    >
-                        {sidebarCollapsed ? (
-                            <SidebarOpen size={20} className="text-gray-600" />
-                        ) : (
-                            <SidebarClose size={20} className="text-gray-600" />
-                        )}
-                    </button>
+                    {/* Mobile Menu Toggle Button (visible on mobile) */}
+                    {isMobile && (
+                        <button
+                            onClick={onMobileMenuToggle}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+                            aria-label="Toggle mobile menu"
+                        >
+                            <Menu size={20} className="text-gray-600" />
+                        </button>
+                    )}
+
+                    {/* Desktop Sidebar Toggle Button */}
+                    {!isMobile && (
+                        <button
+                            onClick={onToggleSidebar}
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors hidden lg:block"
+                            aria-label={
+                                sidebarCollapsed
+                                    ? "Expand sidebar"
+                                    : "Collapse sidebar"
+                            }
+                        >
+                            {sidebarCollapsed ? (
+                                <SidebarOpen size={20} className="text-gray-600" />
+                            ) : (
+                                <SidebarClose size={20} className="text-gray-600" />
+                            )}
+                        </button>
+                    )}
 
                     {/* Logo - Mobile & Desktop Versions */}
                     <div className="flex items-center">

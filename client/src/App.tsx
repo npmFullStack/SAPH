@@ -1,6 +1,6 @@
-// App.tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "@/pages/Index";
+import Index from './pages/Index';
+import Home from "@/pages/Home";
 import LearnMore from "@/pages/LearnMore";
 import Pricing from "@/pages/Pricing";
 import Login from "@/pages/Login";
@@ -12,21 +12,18 @@ const App = () => {
     return (
         <BrowserRouter>
             <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Home />} />
+                {/* Public routes */}
+                <Route path="/" element={<Index />} />
                 <Route path="/learn-more" element={<LearnMore />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/signin" element={<Login />} />
                 <Route path="/signup" element={<Register />} />
 
-                {/* Protected Routes */}
+                {/* Protected routes with layout */}
                 <Route element={<ProtectedLayout />}>
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/home" element={<Home />} />
                     {/* Add more protected routes here */}
-                    {/* <Route path="/books" element={<Books />} />
-                    <Route path="/students" element={<Students />} />
-                    <Route path="/profile" element={<Profile />} />
-                    ... etc */}
                 </Route>
             </Routes>
         </BrowserRouter>
