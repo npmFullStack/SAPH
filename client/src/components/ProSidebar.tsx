@@ -69,26 +69,24 @@ const ProSidebar = ({
         fetchActiveLibrary();
     }, []);
 
-    // Fetch active library
+    // Fetch active library - FIXED VERSION
     const fetchActiveLibrary = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
+            // Use the same endpoint as Home.tsx
+            const response = await api.get("/libraries");
 
-            if (token) {
-                const response = await api.get("/libraries/active");
-                if (response.data.success) {
-                    setActiveLibrary(response.data.data.library);
-                }
+            if (response.data.success && response.data.data.libraries) {
+                // Find active library from the list
+                const active = response.data.data.libraries.find(
+                    (lib: Library) => lib.isActive
+                );
+                setActiveLibrary(active || null);
             }
         } catch (error: any) {
             console.error("Error fetching active library:", error);
-            if (error.response?.status === 401) {
-                // Token expired or invalid
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                window.location.href = "/signin";
-            }
+            // Don't redirect on error - just set no library
+            setActiveLibrary(null);
         } finally {
             setLoading(false);
         }
@@ -166,31 +164,49 @@ const ProSidebar = ({
                             <div className="flex items-center space-x-3">
                                 {loading ? (
                                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                ) : activeLibrary?.imageUrl ? (
-                                    <img
-                                        src={activeLibrary.imageUrl}
-                                        alt={activeLibrary.name}
-                                        className="w-10 h-10 rounded-lg object-cover"
-                                    />
+                                ) : activeLibrary ? (
+                                    <>
+                                        {activeLibrary.imageUrl ? (
+                                            <img
+                                                src={activeLibrary.imageUrl}
+                                                alt={activeLibrary.name}
+                                                className="w-10 h-10 rounded-lg object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                                <Library
+                                                    size={20}
+                                                    className="text-primary"
+                                                />
+                                            </div>
+                                        )}
+                                        <div>
+                                            <div className="font-medium text-gray-900 text-sm truncate max-w-[150px]">
+                                                {activeLibrary.name}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                Active Library
+                                            </div>
+                                        </div>
+                                    </>
                                 ) : (
-                                    <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                        <Library
-                                            size={20}
-                                            className="text-primary"
-                                        />
-                                    </div>
+                                    <>
+                                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                                            <Library
+                                                size={20}
+                                                className="text-gray-400"
+                                            />
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 text-sm">
+                                                No Library
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                Create a library
+                                            </div>
+                                        </div>
+                                    </>
                                 )}
-                                <div>
-                                    <div className="font-medium text-gray-900 text-sm truncate max-w-[150px]">
-                                        {activeLibrary?.name ||
-                                            "No Active Library"}
-                                    </div>
-                                    <div className="text-xs text-gray-500">
-                                        {activeLibrary
-                                            ? "Active Library"
-                                            : "Select a library"}
-                                    </div>
-                                </div>
                             </div>
                             {/* Close button for mobile */}
                             <button
@@ -203,8 +219,8 @@ const ProSidebar = ({
                     )}
                 </div>
 
-                {/* Navigation Items - Takes remaining space */}
-                <nav className="flex-1 space-y-1 overflow-y-auto px-3">
+                {/* Navigation Items - Takes remaining space - UPDATED STYLE */}
+                <nav className="flex-1 space-y-1 overflow-y-auto px-0 mx-3">
                     {navItems.map(item => {
                         const Icon = item.icon;
                         return (
@@ -214,25 +230,37 @@ const ProSidebar = ({
                                 onClick={handleNavClick}
                                 className={({ isActive }) => `
                                     flex items-center ${collapsed ? "justify-center" : ""} 
-                                    px-3 py-3 transition-all duration-200
+                                    py-3 transition-all duration-200 relative
                                     ${
                                         isActive
-                                            ? "bg-primary text-white font-medium rounded-lg"
-                                            : "text-gray-700 hover:bg-gray-100 hover:text-primary"
+                                            ? "text-primary font-semibold"
+                                            : "text-gray-700 hover:text-primary hover:bg-gray-100"
                                     }
-                                    group relative
+                                    group
                                 `}
                             >
                                 {({ isActive }) => (
                                     <>
-                                        <Icon
-                                            size={20}
-                                            className={`
-                                            ${collapsed ? "" : "mr-3"}
-                                            ${isActive ? "text-white" : "text-gray-500 group-hover:text-primary"}
-                                        `}
-                                        />
-                                        {!collapsed && <span>{item.name}</span>}
+                                        {/* Active Indicator - Flush against left edge */}
+                                        {isActive && (
+                                            <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-r-full"></div>
+                                        )}
+
+                                        <div
+                                            className={`${collapsed ? "" : "ml-3"} flex items-center`}
+                                        >
+                                            <Icon
+                                                size={20}
+                                                className={`
+                                                    ${isActive ? "text-primary" : "text-gray-500 group-hover:text-primary"}
+                                                `}
+                                            />
+                                            {!collapsed && (
+                                                <span className="ml-3">
+                                                    {item.name}
+                                                </span>
+                                            )}
+                                        </div>
 
                                         {/* Tooltip for collapsed state */}
                                         {collapsed && (

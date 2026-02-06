@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Library, RefreshCw } from "lucide-react";
+import { Library, RefreshCw, Plus } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import Button from "@/components/Button";
 import api from "@/services/api";
 import heroBg from "@/assets/images/heroBg.png";
+import CreateLibraryModal from "@/components/modals/CreateLibrary";
 
 interface Library {
     id: number;
@@ -21,6 +22,7 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [switchLoading, setSwitchLoading] = useState<number | null>(null);
     const [user, setUser] = useState<any>(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     // Fetch user data
     useEffect(() => {
@@ -107,6 +109,13 @@ const Home = () => {
         }
     };
 
+    // Handle library created
+    const handleLibraryCreated = (newLibrary: Library) => {
+        setLibraries([...libraries, newLibrary]);
+        setActiveLibrary(newLibrary);
+        setShowCreateModal(false);
+    };
+
     // Manage library
     const manageLibrary = (libraryId: number) => {
         navigate(`/library/${libraryId}`);
@@ -160,25 +169,37 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Switch Library Button - Top Right */}
-                        {libraries.filter(lib => !lib.isActive).length > 0 && (
-                            <Button
-                                onClick={() => {
-                                    const firstInactive = libraries.find(
-                                        lib => !lib.isActive
-                                    );
-                                    if (firstInactive) {
-                                        switchLibrary(firstInactive.id);
-                                    }
-                                }}
-                                variant="secondary"
-                                size="sm"
-                                loading={switchLoading !== null}
-                                icon={RefreshCw}
-                            >
-                                Switch Library
-                            </Button>
-                        )}
+                        {/* Actions - Top Right */}
+                        <div className="flex gap-2">
+                            {libraries.length === 0 ? (
+                                <Button
+                                    onClick={() => setShowCreateModal(true)}
+                                    variant="primary"
+                                    size="sm"
+                                    icon={Plus}
+                                >
+                                    Create First Library
+                                </Button>
+                            ) : libraries.filter(lib => !lib.isActive).length >
+                              0 ? (
+                                <Button
+                                    onClick={() => {
+                                        const firstInactive = libraries.find(
+                                            lib => !lib.isActive
+                                        );
+                                        if (firstInactive) {
+                                            switchLibrary(firstInactive.id);
+                                        }
+                                    }}
+                                    variant="secondary"
+                                    size="sm"
+                                    loading={switchLoading !== null}
+                                    icon={RefreshCw}
+                                >
+                                    Switch Library
+                                </Button>
+                            ) : null}
+                        </div>
                     </div>
 
                     {/* Welcome Message - Centered */}
@@ -191,6 +212,23 @@ const Home = () => {
                             oversee all library activities from your centralized
                             dashboard.
                         </p>
+
+                        {libraries.length === 0 && (
+                            <div className="mt-6">
+                                <Button
+                                    onClick={() => setShowCreateModal(true)}
+                                    variant="primary"
+                                    size="lg"
+                                    icon={Plus}
+                                >
+                                    Create Your First Library
+                                </Button>
+                                <p className="text-gray-500 mt-3 text-sm">
+                                    Start by creating your first library to
+                                    manage books, students, and borrowings.
+                                </p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -209,30 +247,52 @@ const Home = () => {
                                     Select a library to activate
                                 </p>
                             </div>
-                            <button
-                                onClick={fetchLibraries}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="Refresh libraries"
-                            >
-                                <RefreshCw
-                                    size={18}
-                                    className="text-gray-500"
-                                />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    onClick={() => setShowCreateModal(true)}
+                                    variant="secondary"
+                                    size="sm"
+                                    icon={Plus}
+                                >
+                                    Create New
+                                </Button>
+                                <button
+                                    onClick={fetchLibraries}
+                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    title="Refresh libraries"
+                                >
+                                    <RefreshCw
+                                        size={18}
+                                        className="text-gray-500"
+                                    />
+                                </button>
+                            </div>
                         </div>
 
                         {libraries.length === 0 ? (
-                            <div className="p-8 text-center bg-gray-50 rounded-lg border border-gray-200">
-                                <Library
-                                    size={48}
-                                    className="mx-auto text-gray-300 mb-3"
-                                />
+                            <div className="p-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Library
+                                        size={36}
+                                        className="text-primary"
+                                    />
+                                </div>
                                 <h3 className="text-lg font-medium text-gray-700 mb-2">
                                     No Libraries Yet
                                 </h3>
-                                <p className="text-gray-500 mb-4">
-                                    You don't have any libraries yet.
+                                <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                                    You don't have any libraries yet. Create
+                                    your first library to start managing books,
+                                    students, and borrowings.
                                 </p>
+                                <Button
+                                    onClick={() => setShowCreateModal(true)}
+                                    variant="primary"
+                                    size="lg"
+                                    icon={Plus}
+                                >
+                                    Create Your First Library
+                                </Button>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -378,6 +438,13 @@ const Home = () => {
                     </div>
                 </div>
             </PageLayout>
+
+            {/* Create Library Modal */}
+            <CreateLibraryModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={handleLibraryCreated}
+            />
         </div>
     );
 };
